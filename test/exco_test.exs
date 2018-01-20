@@ -31,7 +31,7 @@ defmodule ExcoTest do
         each_receive_loop([x | result], counter+1)
 
       :done ->
-        Enum.reverse(result)
+        Enum.sort(result)
 
       other -> {:invalid_message, other}
     end
