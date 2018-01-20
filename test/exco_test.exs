@@ -32,6 +32,8 @@ defmodule ExcoTest do
 
       :done ->
         Enum.reverse(result)
+
+      other -> {:invalid_message, other}
     end
   end
 
