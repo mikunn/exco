@@ -2,7 +2,37 @@ defmodule ExcoTest do
   use ExUnit.Case
   doctest Exco
 
-  test "greets the world" do
-    assert Exco.hello() == :world
+  test "map" do
+    assert Exco.map([], &(&1 * &1)) == []
+    assert Exco.map([1, 2, 3], &(&1 * &1)) == [1, 4, 9]
   end
+
+  test "each" do
+    assert Exco.each([], fn x -> x end) == :ok
+
+    pid = self()
+
+    l = [1, 2, 3]
+    assert Exco.each(l, fn x -> send(pid, {:value, x, length(l)}) end) == :ok
+    assert each_receive_loop([]) == l
+  end
+
+  test "filter" do
+    assert Exco.filter([1, 2, 3], &(&1*2 < 5)) == [1, 2]
+  end
+
+  defp each_receive_loop(result, counter \\ 1) do
+    receive do
+      {:value, x, total} when total == counter ->
+        send(self(), :done)
+        each_receive_loop([x | result], counter)
+
+      {:value, x, _total} ->
+        each_receive_loop([x | result], counter+1)
+
+      :done ->
+        Enum.reverse(result)
+    end
+  end
+
 end
