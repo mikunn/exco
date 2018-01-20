@@ -30,21 +30,4 @@ defmodule Exco.OptsTest do
     assert result == expected
   end
 
-  test "normalizing max_concurrency" do
-    opts = [max_concurrency: 3]
-    enum = [1,2,3]
-
-    assert Exco.Opts.normalize(opts, :map, enum) == [max_concurrency: :full]
-
-    opts = [max_concurrency: 3]
-    enum = [1, 2]
-
-    assert Exco.Opts.normalize(opts, :map, enum) == [max_concurrency: :full]
-
-    opts = [max_concurrency: 3]
-    enum = [1, 2, 3, 4]
-
-    assert Exco.Opts.normalize(opts, :map, enum) == [max_concurrency: 3]
-  end
-
 end

@@ -20,7 +20,6 @@ defmodule Exco do
 
   defp run(operation, enumerable, fun, opts) do
     opts = Opts.set_defaults(opts, @default_options)
-           |> Opts.normalize(operation, enumerable)
            |> Enum.into(%{})
     enumerate(operation, enumerable, fun, opts)
   end
