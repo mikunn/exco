@@ -14,12 +14,12 @@ defmodule Exco do
 
   defp enumerate(:map, enumerable, fun) do
     get_stream(enumerable, fun)
-    |> Enum.map(fn res -> res end)
+    |> Enum.map(fn {:ok, value} -> value end)
   end
 
   defp enumerate(:each, enumerable, fun) do
     get_stream(enumerable, fun)
-    |> Enum.each(fn res -> res end)
+    |> Enum.each(fn value -> value end)
   end
 
   defp enumerate(:filter, enumerable, fun) do
