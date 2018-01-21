@@ -48,7 +48,7 @@ defmodule Exco do
         {true, val}           -> [val | acc]
         {{:ok, true}, val}    -> [val | acc]
         {false, _val}         -> acc
-        {{:ok, false}, val}   -> acc
+        {{:ok, false}, _val}   -> acc
       end
     end)
     |> Enum.reverse
