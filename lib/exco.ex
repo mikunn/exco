@@ -24,58 +24,37 @@ defmodule Exco do
     enumerate(operation, enumerable, fun, opts)
   end
 
-  defp enumerate(:map, enumerable, fun, %{max_concurrency: conc}) when conc == :full do
-    get_awaited_map(enumerable, fun)
-  end
-
   defp enumerate(:map, enumerable, fun, %{max_concurrency: conc}) do
-    get_async_stream(enumerable, fun, max_concurrency: conc)
-    |> Enum.map(fn {:ok, value} -> value end)
-  end
+    task_func = Exco.Enum.task_func(conc)
 
-  defp enumerate(:each, enumerable, fun, %{max_concurrency: conc}) when conc == :full do
-    get_awaited_map(enumerable, fun)
-    |> Enum.each(fn value -> value end)
+    task_func.(enumerable, fun, max_concurrency: conc)
+    |> Enum.map(&resolve_map_value/1)
   end
 
   defp enumerate(:each, enumerable, fun, %{max_concurrency: conc}) do
-    get_async_stream(enumerable, fun, max_concurrency: conc)
+    task_func = Exco.Enum.task_func(conc)
+
+    task_func.(enumerable, fun, max_concurrency: conc)
     |> Enum.each(fn value -> value end)
   end
 
-  defp enumerate(:filter, enumerable, fun, %{max_concurrency: conc}) when conc == :full do
-    get_awaited_map(enumerable, fun)
-    |> Enum.zip(enumerable)
-    |> Enum.filter(fn res ->
-      case res do
-        {true, _} -> true
-        _ -> false
-      end
-    end)
-    |> Enum.map(fn {true, value} -> value end)
-  end
-
   defp enumerate(:filter, enumerable, fun, %{max_concurrency: conc}) do
-    get_async_stream(enumerable, fun, max_concurrenct: conc)
+    task_func = Exco.Enum.task_func(conc)
+
+    task_func.(enumerable, fun, max_concurrency: conc)
     |> Enum.zip(enumerable)
-    |> Enum.filter(fn res ->
+    |> Enum.reduce([], fn res, acc ->
       case res do
-        {{:ok, true}, _} -> true
-        _ -> false
+        {true, val}           -> [val | acc]
+        {{:ok, true}, val}    -> [val | acc]
+        {false, _val}         -> acc
+        {{:ok, false}, val}   -> acc
       end
     end)
-    |> Enum.map(fn {{:ok, true}, value} -> value end)
+    |> Enum.reverse
   end
 
-  defp get_async_stream(enumerable, fun, options) do
-    enumerable
-    |> Task.async_stream(fun, options)
-  end
-
-  defp get_awaited_map(enumerable, fun) do
-    enumerable
-    |> Enum.map(&(Task.async(fn -> fun.(&1) end)))
-    |> Enum.map(&Task.await/1)
-  end
+  defp resolve_map_value({:ok, value}), do: value
+  defp resolve_map_value(value),        do: value
 
 end
