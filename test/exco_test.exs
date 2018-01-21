@@ -31,11 +31,11 @@ defmodule ExcoTest do
   end
 
   test "filter" do
-    assert Exco.filter([1, 2, 3], &(&1*2 < 5)) == [1, 2]
+    assert Exco.filter([1, 2, 3], &(&1 * 2 < 5)) == [1, 2]
   end
 
   test "filter with max_concurrency option" do
-    assert Exco.filter([1, 2, 3], &(&1*2 < 5), max_concurrency: 2) == [1, 2]
+    assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2) == [1, 2]
   end
 
   defp each_receive_loop(result, counter \\ 1) do
@@ -45,13 +45,13 @@ defmodule ExcoTest do
         each_receive_loop([x | result], counter)
 
       {:value, x, _total} ->
-        each_receive_loop([x | result], counter+1)
+        each_receive_loop([x | result], counter + 1)
 
       :done ->
         Enum.sort(result)
 
-      other -> {:invalid_message, other}
+      other ->
+        {:invalid_message, other}
     end
   end
-
 end

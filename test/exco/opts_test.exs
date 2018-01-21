@@ -5,7 +5,7 @@ defmodule Exco.OptsTest do
   test "setting defaults" do
     assert Exco.Opts.set_defaults() == []
     assert Exco.Opts.set_defaults([], []) == []
-    assert Exco.Opts.set_defaults([], [some_opt: 1]) == [some_opt: 1]
+    assert Exco.Opts.set_defaults([], some_opt: 1) == [some_opt: 1]
 
     options = [
       max_concurrency: 20,
@@ -19,15 +19,16 @@ defmodule Exco.OptsTest do
       third_option: false
     ]
 
-    result = Exco.Opts.set_defaults(options, default) |> Enum.sort
+    result = Exco.Opts.set_defaults(options, default) |> Enum.sort()
 
-    expected = [
-      max_concurrency: 20,
-      second_option: true,
-      third_option: false
-    ] |> Enum.sort
+    expected =
+      [
+        max_concurrency: 20,
+        second_option: true,
+        third_option: false
+      ]
+      |> Enum.sort()
 
     assert result == expected
   end
-
 end

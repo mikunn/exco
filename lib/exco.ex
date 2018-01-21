@@ -1,5 +1,4 @@
 defmodule Exco do
-
   alias Exco.Opts
 
   @default_options [
@@ -19,8 +18,10 @@ defmodule Exco do
   end
 
   defp run(operation, enumerable, fun, opts) do
-    opts = Opts.set_defaults(opts, @default_options)
-           |> Enum.into(%{})
+    opts =
+      Opts.set_defaults(opts, @default_options)
+      |> Enum.into(%{})
+
     enumerate(operation, enumerable, fun, opts)
   end
 
@@ -45,16 +46,15 @@ defmodule Exco do
     |> Enum.zip(enumerable)
     |> Enum.reduce([], fn res, acc ->
       case res do
-        {true, val}           -> [val | acc]
-        {{:ok, true}, val}    -> [val | acc]
-        {false, _val}         -> acc
-        {{:ok, false}, _val}   -> acc
+        {true, val} -> [val | acc]
+        {{:ok, true}, val} -> [val | acc]
+        {false, _val} -> acc
+        {{:ok, false}, _val} -> acc
       end
     end)
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   defp resolve_map_value({:ok, value}), do: value
-  defp resolve_map_value(value),        do: value
-
+  defp resolve_map_value(value), do: value
 end
