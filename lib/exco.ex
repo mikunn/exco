@@ -2,7 +2,8 @@ defmodule Exco do
   alias Exco.Opts
 
   @default_options [
-    max_concurrency: :full
+    max_concurrency: :full,
+    linkage: :link
   ]
 
   def map(enumerable, fun, opts \\ []) do
@@ -25,24 +26,18 @@ defmodule Exco do
     enumerate(operation, enumerable, fun, opts)
   end
 
-  defp enumerate(:map, enumerable, fun, %{max_concurrency: conc}) do
-    task_func = Exco.Enum.task_func(conc)
-
-    task_func.(enumerable, fun, max_concurrency: conc)
+  defp enumerate(:map, enumerable, fun, options) do
+    Exco.Enum.results(enumerable, fun, options)
     |> Enum.map(&resolve_map_value/1)
   end
 
-  defp enumerate(:each, enumerable, fun, %{max_concurrency: conc}) do
-    task_func = Exco.Enum.task_func(conc)
-
-    task_func.(enumerable, fun, max_concurrency: conc)
+  defp enumerate(:each, enumerable, fun, options) do
+    Exco.Enum.results(enumerable, fun, options)
     |> Enum.each(fn value -> value end)
   end
 
-  defp enumerate(:filter, enumerable, fun, %{max_concurrency: conc}) do
-    task_func = Exco.Enum.task_func(conc)
-
-    task_func.(enumerable, fun, max_concurrency: conc)
+  defp enumerate(:filter, enumerable, fun, options) do
+    Exco.Enum.results(enumerable, fun, options)
     |> Enum.zip(enumerable)
     |> Enum.reduce([], fn res, acc ->
       case res do

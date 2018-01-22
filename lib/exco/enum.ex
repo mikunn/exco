@@ -1,13 +1,27 @@
 defmodule Exco.Enum do
-  def task_func(_max_conc = :full), do: &awaited_map/3
-  def task_func(_max_conc), do: &async_stream/3
-
-  def async_stream(enumerable, fun, options) do
-    enumerable
-    |> Task.async_stream(fun, options)
+  def results(enumerable, fun, %{max_concurrency: :full, linkage: :link}) do
+    awaited_map(enumerable, fun)
   end
 
-  def awaited_map(enumerable, fun, _options \\ []) do
+  def results(enumerable, fun, %{max_concurrency: conc, linkage: :link}) do
+    async_stream(enumerable, fun, max_concurrency: conc)
+  end
+
+  def results(enumerable, fun, %{max_concurrency: conc, linkage: :nolink}) do
+    async_stream_nolink(enumerable, fun, max_concurrency: conc)
+  end
+
+  defp async_stream(enumerable, fun, options) do
+    Exco.TaskSupervisor
+    |> Task.Supervisor.async_stream(enumerable, fun, options)
+  end
+
+  defp async_stream_nolink(enumerable, fun, options) do
+    Exco.TaskSupervisor
+    |> Task.Supervisor.async_stream_nolink(enumerable, fun, options)
+  end
+
+  defp awaited_map(enumerable, fun) do
     enumerable
     |> Enum.map(&Task.async(fn -> fun.(&1) end))
     |> Enum.map(&Task.await/1)
