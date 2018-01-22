@@ -5,7 +5,7 @@ defmodule Exco.Application do
 
   def start(_type, _args) do
     children = [
-      {Task.Supervisor, name: Exco.TaskSupervisor, restart: :temporary, type: :supervisor}
+      {Task.Supervisor, name: Exco.TaskSupervisor}
     ]
 
     opts = [strategy: :one_for_one, name: Exco.Supervisor]
