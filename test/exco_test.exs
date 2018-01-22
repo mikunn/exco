@@ -5,9 +5,7 @@ defmodule ExcoTest do
   test "map" do
     assert Exco.map([], &(&1 * &1)) == []
     assert Exco.map([1, 2, 3], &(&1 * &1)) == [1, 4, 9]
-  end
 
-  test "map with max_concurrency option" do
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: 2) == [1, 4, 9]
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :full) == [1, 4, 9]
   end
@@ -18,12 +16,9 @@ defmodule ExcoTest do
     pid = self()
 
     l = [1, 2, 3]
+
     assert Exco.each(l, fn x -> send(pid, {:value, x, length(l)}) end) == :ok
     assert each_receive_loop([]) == l
-  end
-
-  test "each with max_concurrency option" do
-    pid = self()
 
     l = [1, 2, 3]
     assert Exco.each(l, fn x -> send(pid, {:value, x, length(l)}) end, max_concurrency: 2) == :ok
@@ -32,9 +27,6 @@ defmodule ExcoTest do
 
   test "filter" do
     assert Exco.filter([1, 2, 3], &(&1 * 2 < 5)) == [1, 2]
-  end
-
-  test "filter with max_concurrency option" do
     assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2) == [1, 2]
   end
 
