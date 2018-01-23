@@ -3,7 +3,8 @@ defmodule Exco do
 
   @default_options [
     max_concurrency: :auto,
-    linkage: :link
+    linkage: :link,
+    ordered: true
   ]
 
   def map(enumerable, fun, opts \\ []) do

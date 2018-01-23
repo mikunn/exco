@@ -3,8 +3,12 @@ defmodule Exco.Enum do
     awaited_map(enumerable, fun)
   end
 
-  def results(enumerable, fun, %{max_concurrency: conc, linkage: :link}) do
-    async_stream(enumerable, fun, max_concurrency: conc)
+  def results(enumerable, fun, %{max_concurrency: conc, linkage: :link} = options) do
+    opts = [
+      max_concurrency: conc,
+      ordered: options[:ordered]
+    ]
+    async_stream(enumerable, fun, opts)
   end
 
   def results(enumerable, fun, %{linkage: :nolink} = options) do
@@ -14,7 +18,12 @@ defmodule Exco.Enum do
         conc -> conc
       end
 
-    async_stream_nolink(enumerable, fun, max_concurrency: conc)
+    opts = [
+      max_concurrency: conc,
+      ordered: options[:ordered]
+    ]
+
+    async_stream_nolink(enumerable, fun, opts)
   end
 
   defp async_stream(enumerable, fun, options) do
