@@ -52,6 +52,7 @@ defmodule Exco do
       case res do
         {{:ok, true}, val} -> [{:ok, val} | acc]
         {{:ok, false}, _val} -> acc
+        {_result, _val} -> acc
       end
     end)
   end
