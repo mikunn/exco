@@ -2,7 +2,7 @@ defmodule Exco do
   alias Exco.Opts
 
   @default_options [
-    max_concurrency: :full,
+    max_concurrency: :auto,
     linkage: :link
   ]
 
@@ -28,7 +28,7 @@ defmodule Exco do
 
   defp enumerate(:map, enumerable, fun, options) do
     Exco.Enum.results(enumerable, fun, options)
-    |> Enum.map(&resolve_map_value/1)
+    |> Enum.map(&resolve_map_value(&1, options))
   end
 
   defp enumerate(:each, enumerable, fun, options) do
@@ -39,7 +39,25 @@ defmodule Exco do
   defp enumerate(:filter, enumerable, fun, options) do
     Exco.Enum.results(enumerable, fun, options)
     |> Enum.zip(enumerable)
-    |> Enum.reduce([], fn res, acc ->
+    |> resolve_filter_values(options)
+    |> Enum.reverse()
+  end
+
+  defp resolve_map_value(value, %{linkage: :nolink}), do: value
+  defp resolve_map_value({:ok, value}, %{linkage: :link}), do: value
+  defp resolve_map_value(value, _options), do: value
+
+  defp resolve_filter_values(enum, %{linkage: :nolink}) do
+    Enum.reduce(enum, [], fn res, acc ->
+      case res do
+        {{:ok, true}, val} -> [{:ok, val} | acc]
+        {{:ok, false}, _val} -> acc
+      end
+    end)
+  end
+
+  defp resolve_filter_values(enum, %{linkage: :link}) do
+    Enum.reduce(enum, [], fn res, acc ->
       case res do
         {true, val} -> [val | acc]
         {{:ok, true}, val} -> [val | acc]
@@ -47,9 +65,5 @@ defmodule Exco do
         {{:ok, false}, _val} -> acc
       end
     end)
-    |> Enum.reverse()
   end
-
-  defp resolve_map_value({:ok, value}), do: value
-  defp resolve_map_value(value), do: value
 end
