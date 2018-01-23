@@ -108,6 +108,78 @@ defmodule ExcoTest do
     refute_receive :caller_alive
   end
 
+  test "each: tasks die when caller dies" do
+    pid = self()
+
+    caller =
+      spawn(fn ->
+        Exco.each([1, 2, 3], fn x ->
+          Process.sleep(50)
+          send(pid, :task_alive)
+          x
+        end)
+      end)
+
+    Process.sleep(30)
+    Process.exit(caller, :kill)
+
+    refute_receive :task_alive
+  end
+
+  test "each: caller dies when a task dies" do
+    pid = self()
+
+    spawn(fn ->
+      spawn_link(fn ->
+        Exco.each([1, 0, 2], fn _ ->
+          Process.sleep(10)
+          Process.exit(self(), :kill)
+        end)
+      end)
+
+      Process.sleep(50)
+      send(pid, :caller_alive)
+    end)
+
+    refute_receive :caller_alive
+  end
+
+  test "filter: tasks die when caller dies" do
+    pid = self()
+
+    caller =
+      spawn(fn ->
+        Exco.filter([1, 2, 3], fn x ->
+          Process.sleep(50)
+          send(pid, :task_alive)
+          x
+        end)
+      end)
+
+    Process.sleep(30)
+    Process.exit(caller, :kill)
+
+    refute_receive :task_alive
+  end
+
+  test "filter: caller dies when a task dies" do
+    pid = self()
+
+    spawn(fn ->
+      spawn_link(fn ->
+        Exco.filter([1, 0, 2], fn _ ->
+          Process.sleep(10)
+          Process.exit(self(), :kill)
+        end)
+      end)
+
+      Process.sleep(50)
+      send(pid, :caller_alive)
+    end)
+
+    refute_receive :caller_alive
+  end
+
   defp each_receive_loop(result, counter \\ 1) do
     receive do
       {:value, x, total} when total == counter ->
