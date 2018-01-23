@@ -23,7 +23,7 @@ defmodule Exco.Enum do
 
   defp async_stream_nolink(enumerable, fun, options) do
     Exco.TaskSupervisor
-    |> Task.Supervisor.async_stream(enumerable, fun, options)
+    |> Task.Supervisor.async_stream_nolink(enumerable, fun, options)
   end
 
   defp awaited_map(enumerable, fun) do
