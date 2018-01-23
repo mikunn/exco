@@ -20,7 +20,10 @@ defmodule Exco.NolinkTest do
     assert each_receive_loop([]) == l
 
     l = [1, 2, 3]
-    assert Exco.Nolink.each(l, fn x -> send(pid, {:value, x, length(l)}) end, max_concurrency: 2) == :ok
+
+    assert Exco.Nolink.each(l, fn x -> send(pid, {:value, x, length(l)}) end, max_concurrency: 2) ==
+             :ok
+
     assert each_receive_loop([]) == l
   end
 
@@ -90,16 +93,17 @@ defmodule Exco.NolinkTest do
 
     spawn(fn ->
       spawn_link(fn ->
-        result = Exco.Nolink.map([1, 0, 2], fn x ->
-          Process.sleep(10)
+        result =
+          Exco.Nolink.map([1, 0, 2], fn x ->
+            Process.sleep(10)
 
-          if x == 0 do
-            Process.exit(self(), :kill)
-          else
-            x
-          end
+            if x == 0 do
+              Process.exit(self(), :kill)
+            else
+              x
+            end
+          end)
 
-        end)
         send(pid, {:result, result})
       end)
 
@@ -136,16 +140,17 @@ defmodule Exco.NolinkTest do
 
     spawn(fn ->
       spawn_link(fn ->
-        result = Exco.Nolink.each([1, 0, 2], fn x ->
-          Process.sleep(10)
+        result =
+          Exco.Nolink.each([1, 0, 2], fn x ->
+            Process.sleep(10)
 
-          if x == 0 do
-            Process.exit(self(), :kill)
-          else
-            x
-          end
+            if x == 0 do
+              Process.exit(self(), :kill)
+            else
+              x
+            end
+          end)
 
-        end)
         send(pid, {:result, result})
       end)
 
@@ -182,16 +187,17 @@ defmodule Exco.NolinkTest do
 
     spawn(fn ->
       spawn_link(fn ->
-        result = Exco.Nolink.filter([1, 0, 2], fn x ->
-          Process.sleep(10)
+        result =
+          Exco.Nolink.filter([1, 0, 2], fn x ->
+            Process.sleep(10)
 
-          if x == 0 do
-            Process.exit(self(), :kill)
-          else
-            x < 2
-          end
+            if x == 0 do
+              Process.exit(self(), :kill)
+            else
+              x < 2
+            end
+          end)
 
-        end)
         send(pid, {:result, result})
       end)
 
@@ -202,5 +208,4 @@ defmodule Exco.NolinkTest do
     assert_receive :caller_alive
     assert_receive {:result, [ok: 1]}
   end
-
 end

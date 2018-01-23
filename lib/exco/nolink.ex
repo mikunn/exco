@@ -13,5 +13,4 @@ defmodule Exco.Nolink do
     opts = Keyword.put(opts, :linkage, :nolink)
     Exco.filter(enumerable, fun, opts)
   end
-
 end

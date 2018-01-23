@@ -8,10 +8,11 @@ defmodule Exco.Enum do
   end
 
   def results(enumerable, fun, %{linkage: :nolink} = options) do
-    conc = case options[:max_concurrency] do
-      :auto -> System.schedulers_online
-      conc -> conc
-    end
+    conc =
+      case options[:max_concurrency] do
+        :auto -> System.schedulers_online()
+        conc -> conc
+      end
 
     async_stream_nolink(enumerable, fun, max_concurrency: conc)
   end
