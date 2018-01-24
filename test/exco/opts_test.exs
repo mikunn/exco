@@ -1,6 +1,6 @@
 defmodule Exco.OptsTest do
   use ExUnit.Case
-  doctest Exco
+  doctest Exco.Opts
 
   test "setting defaults" do
     assert Exco.Opts.set_defaults() == []

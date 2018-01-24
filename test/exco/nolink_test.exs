@@ -1,6 +1,6 @@
 defmodule Exco.NolinkTest do
   use ExUnit.Case
-  doctest Exco
+  doctest Exco.Nolink
 
   test "map" do
     assert Exco.Nolink.map([], &(&1 * &1)) == []
