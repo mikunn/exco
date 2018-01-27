@@ -1,4 +1,6 @@
 defmodule Exco.Enum do
+  @moduledoc false
+
   def results(enumerable, fun, %{max_concurrency: :auto, linkage: :link}) do
     awaited_map(enumerable, fun)
   end
@@ -8,6 +10,7 @@ defmodule Exco.Enum do
       max_concurrency: conc,
       ordered: options[:ordered]
     ]
+
     async_stream(enumerable, fun, opts)
   end
 
