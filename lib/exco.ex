@@ -1,4 +1,18 @@
 defmodule Exco do
+  @moduledoc ~S"""
+
+  Concurrent versions of some of the `Enum` functions
+  spawning the tasks linked to the caller.
+
+  See further discussion in the [readme section](readme.html).
+
+  ## Options
+
+  * `max_concurrency`: the maximum number of items to run concurrently.
+    By default, spawns as many processes as there are items.
+
+  """
+
   alias Exco.Opts
 
   @default_options [
@@ -7,14 +21,68 @@ defmodule Exco do
     ordered: true
   ]
 
+  @doc ~S"""
+  Concurrent version of `Enum.map/2`.
+
+  The applied function runs in a new process for each item.
+  These processes *are* linked to the caller.
+
+  The return value is a list of result values.
+  The ordering is retained.
+
+  See the [options](#module-options).
+
+  ## Examples:
+
+      iex(1)> Exco.map(1..3, fn x -> x*2 end)
+      [2, 4, 6]
+
+  """
   def map(enumerable, fun, opts \\ []) do
     run(:map, enumerable, fun, opts)
   end
 
+  @doc ~S"""
+  Concurrent version of `Enum.each/2`.
+
+  The applied function runs in a new process for each item.
+  These processes *are* linked to the caller.
+
+  Returns `:ok`.
+
+  See the [options](#module-options).
+
+  ## Examples
+
+      Exco.each(1..3, fn x -> IO.puts x*2 end)
+      2 
+      4 
+      6
+      #=> :ok
+
+  """
   def each(enumerable, fun, opts \\ []) do
     run(:each, enumerable, fun, opts)
   end
 
+  @doc ~S"""
+  Concurrent version of `Enum.filter/2`.
+
+  The applied function runs in a new process for each item.
+  These processes *are* linked to the caller.
+
+  The return value is a list and consists of the original
+  values for which the applied function returns a truthy value.
+  The ordering is retained.
+
+  See the [options](#module-options).
+
+  ## Examples:
+
+      iex(1)> Exco.filter(1..3, fn x -> x < 3 end)
+      [1, 2]
+
+  """
   def filter(enumerable, fun, opts \\ []) do
     run(:filter, enumerable, fun, opts)
   end
