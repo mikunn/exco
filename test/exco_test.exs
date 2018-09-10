@@ -8,6 +8,7 @@ defmodule ExcoTest do
 
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: 2) == [1, 4, 9]
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :auto) == [1, 4, 9]
+    assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :full) == [1, 4, 9]
   end
 
   test "each" do

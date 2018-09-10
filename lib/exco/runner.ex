@@ -1,8 +1,17 @@
 defmodule Exco.Runner do
   @moduledoc false
 
-  def enumerate(enumerable, fun, %{max_concurrency: :auto, linkage: :link}) do
+  def enumerate(enumerable, fun, %{max_concurrency: :full, linkage: :link}) do
     awaited_map(enumerable, fun)
+  end
+
+  def enumerate(enumerable, fun, %{max_concurrency: :auto, linkage: :link} = options) do
+    opts = [
+      max_concurrency: resolve_max_concurrency(:auto, enumerable),
+      ordered: options[:ordered]
+    ]
+
+    async_stream(enumerable, fun, opts)
   end
 
   def enumerate(enumerable, fun, %{max_concurrency: conc, linkage: :link} = options) do
@@ -17,7 +26,8 @@ defmodule Exco.Runner do
   def enumerate(enumerable, fun, %{linkage: :nolink} = options) do
     conc =
       case options[:max_concurrency] do
-        :auto -> System.schedulers_online()
+        :auto -> resolve_max_concurrency(:auto, enumerable)
+        :full -> resolve_max_concurrency(:full, enumerable)
         conc -> conc
       end
 
@@ -43,5 +53,13 @@ defmodule Exco.Runner do
     enumerable
     |> Enum.map(&Task.async(fn -> fun.(&1) end))
     |> Enum.map(&Task.await/1)
+  end
+
+  defp resolve_max_concurrency(:auto, _enumerable), do: System.schedulers_online()
+  defp resolve_max_concurrency(:full, enumerable) do
+    case Enum.count(enumerable) do
+      0 -> System.schedulers_online()
+      count -> count
+    end
   end
 end

@@ -8,6 +8,7 @@ defmodule Exco.NolinkTest do
 
     assert Exco.Nolink.map([1, 2, 3], &(&1 * &1), max_concurrency: 2) == [ok: 1, ok: 4, ok: 9]
     assert Exco.Nolink.map([1, 2, 3], &(&1 * &1), max_concurrency: :auto) == [ok: 1, ok: 4, ok: 9]
+    assert Exco.Nolink.map([1, 2, 3], &(&1 * &1), max_concurrency: :full) == [ok: 1, ok: 4, ok: 9]
   end
 
   test "each" do
