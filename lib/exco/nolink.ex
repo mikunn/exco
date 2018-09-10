@@ -57,7 +57,7 @@ defmodule Exco.Nolink do
 
   """
   def map(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :linkage, :nolink)
+    opts = Keyword.put(opts, :link, false)
     Exco.map(enumerable, fun, opts)
   end
 
@@ -81,7 +81,7 @@ defmodule Exco.Nolink do
 
   """
   def each(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :linkage, :nolink)
+    opts = Keyword.put(opts, :link, false)
     Exco.each(enumerable, fun, opts)
   end
 
@@ -110,7 +110,7 @@ defmodule Exco.Nolink do
 
   """
   def filter(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :linkage, :nolink)
+    opts = Keyword.put(opts, :link, false)
     Exco.filter(enumerable, fun, opts)
   end
 end

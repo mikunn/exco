@@ -17,7 +17,7 @@ defmodule Exco do
 
   @default_options [
     max_concurrency: :full,
-    linkage: :link,
+    link: true,
     ordered: true
   ]
 
@@ -114,11 +114,11 @@ defmodule Exco do
     |> Enum.reverse()
   end
 
-  defp resolve_map_value(value, %{linkage: :nolink}), do: value
-  defp resolve_map_value({:ok, value}, %{linkage: :link}), do: value
+  defp resolve_map_value(value, %{link: false}), do: value
+  defp resolve_map_value({:ok, value}, %{link: true}), do: value
   defp resolve_map_value(value, _options), do: value
 
-  defp resolve_filter_values(enum, %{linkage: :nolink}) do
+  defp resolve_filter_values(enum, %{link: false}) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
         {{:ok, true}, val} -> [{:ok, val} | acc]
@@ -128,7 +128,7 @@ defmodule Exco do
     end)
   end
 
-  defp resolve_filter_values(enum, %{linkage: :link}) do
+  defp resolve_filter_values(enum, %{link: true}) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
         {true, val} -> [val | acc]
