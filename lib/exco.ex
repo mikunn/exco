@@ -92,21 +92,23 @@ defmodule Exco do
       Opts.set_defaults(opts, @default_options)
       |> Enum.into(%{})
 
-    enumerate(operation, enumerable, fun, opts)
+    enumerable
+    |> Exco.Runner.enumerate(fun, opts)
+    |> resolve_result(enumerable, operation, opts)
   end
 
-  defp enumerate(:map, enumerable, fun, options) do
-    Exco.Enum.results(enumerable, fun, options)
+  defp resolve_result(result, _enumerable, :map, options) do
+    result
     |> Enum.map(&resolve_map_value(&1, options))
   end
 
-  defp enumerate(:each, enumerable, fun, options) do
-    Exco.Enum.results(enumerable, fun, options)
+  defp resolve_result(result, _enumerable, :each, _options) do
+    result
     |> Enum.each(fn value -> value end)
   end
 
-  defp enumerate(:filter, enumerable, fun, options) do
-    Exco.Enum.results(enumerable, fun, options)
+  defp resolve_result(result, enumerable, :filter, options) do
+    result
     |> Enum.zip(enumerable)
     |> resolve_filter_values(options)
     |> Enum.reverse()

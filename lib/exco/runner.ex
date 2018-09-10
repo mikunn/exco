@@ -1,11 +1,11 @@
-defmodule Exco.Enum do
+defmodule Exco.Runner do
   @moduledoc false
 
-  def results(enumerable, fun, %{max_concurrency: :auto, linkage: :link}) do
+  def enumerate(enumerable, fun, %{max_concurrency: :auto, linkage: :link}) do
     awaited_map(enumerable, fun)
   end
 
-  def results(enumerable, fun, %{max_concurrency: conc, linkage: :link} = options) do
+  def enumerate(enumerable, fun, %{max_concurrency: conc, linkage: :link} = options) do
     opts = [
       max_concurrency: conc,
       ordered: options[:ordered]
@@ -14,7 +14,7 @@ defmodule Exco.Enum do
     async_stream(enumerable, fun, opts)
   end
 
-  def results(enumerable, fun, %{linkage: :nolink} = options) do
+  def enumerate(enumerable, fun, %{linkage: :nolink} = options) do
     conc =
       case options[:max_concurrency] do
         :auto -> System.schedulers_online()
