@@ -1,11 +1,19 @@
 defmodule Exco.Runner do
   @moduledoc false
 
-  def enumerate(enumerable, fun, %{max_concurrency: :full, linkage: :link}) do
+  def enumerate(enumerable, fun, %{linkage: :link} = options) do
+    enumerate_link(enumerable, fun, options)
+  end
+
+  def enumerate(enumerable, fun, %{linkage: :nolink} = options) do
+    enumerate_nolink(enumerable, fun, options)
+  end
+
+  defp enumerate_link(enumerable, fun, %{max_concurrency: :full}) do
     awaited_map(enumerable, fun)
   end
 
-  def enumerate(enumerable, fun, %{max_concurrency: :auto, linkage: :link} = options) do
+  defp enumerate_link(enumerable, fun, %{max_concurrency: :auto} = options) do
     opts = [
       max_concurrency: resolve_max_concurrency(:auto, enumerable),
       ordered: options[:ordered]
@@ -14,7 +22,7 @@ defmodule Exco.Runner do
     async_stream(enumerable, fun, opts)
   end
 
-  def enumerate(enumerable, fun, %{max_concurrency: conc, linkage: :link} = options) do
+  defp enumerate_link(enumerable, fun, %{max_concurrency: conc} = options) do
     opts = [
       max_concurrency: conc,
       ordered: options[:ordered]
@@ -23,7 +31,7 @@ defmodule Exco.Runner do
     async_stream(enumerable, fun, opts)
   end
 
-  def enumerate(enumerable, fun, %{linkage: :nolink} = options) do
+  defp enumerate_nolink(enumerable, fun, options) do
     conc =
       case options[:max_concurrency] do
         :auto -> resolve_max_concurrency(:auto, enumerable)
