@@ -16,7 +16,7 @@ defmodule Exco do
   alias Exco.Opts
 
   @default_options [
-    max_concurrency: :full,
+    max_concurrency: :schedulers,
     link: true,
     ordered: true
   ]

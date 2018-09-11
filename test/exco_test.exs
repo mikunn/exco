@@ -8,7 +8,7 @@ defmodule ExcoTest do
     assert Exco.map([1, 2, 3], &(&1 * &1), link: true) == [1, 4, 9]
 
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: 2) == [1, 4, 9]
-    assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :auto) == [1, 4, 9]
+    assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :schedulers) == [1, 4, 9]
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :full) == [1, 4, 9]
   end
 
@@ -17,7 +17,7 @@ defmodule ExcoTest do
     assert Exco.map([1, 2, 3], &(&1 * &1), link: false) == [ok: 1, ok: 4, ok: 9]
 
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: 2, link: false) == [ok: 1, ok: 4, ok: 9]
-    assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :auto, link: false) == [ok: 1, ok: 4, ok: 9]
+    assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :schedulers, link: false) == [ok: 1, ok: 4, ok: 9]
     assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :full, link: false) == [ok: 1, ok: 4, ok: 9]
   end
 
