@@ -1,15 +1,16 @@
 defmodule Exco do
   @moduledoc ~S"""
 
-  Concurrent versions of some of the `Enum` functions
-  spawning the tasks linked to the caller.
+  Functions to run things concurrently.
 
   See further discussion in the [readme section](readme.html).
 
   ## Options
 
-  * `max_concurrency`: the maximum number of items to run concurrently.
-    By default, spawns as many processes as there are items.
+  * `link` - set this to `false` to not link the spawned processes with the caller. Defaults to `true`.
+  * `max_concurrency` - the maximum number of items to run at the same time. Set it to an integer or one of the following:
+    * `:schedulers` (default) - set to `System.schedulers_online/1`
+    * `:full` - tries to run all items at the same time
 
   """
 
@@ -25,9 +26,12 @@ defmodule Exco do
   Concurrent version of `Enum.map/2`.
 
   The applied function runs in a new process for each item.
-  These processes *are* linked to the caller.
 
-  The return value is a list of result values.
+  Depending on the value of `link` option, the result value is either
+
+  * a list of result values (when `link: true`)
+  * a list consisting of either `{:ok, value}` or `{:exit, reason}` tuples (when `link: false`).
+
   The ordering is retained.
 
   See the [options](#module-options).
@@ -46,8 +50,6 @@ defmodule Exco do
   Concurrent version of `Enum.each/2`.
 
   The applied function runs in a new process for each item.
-  These processes *are* linked to the caller.
-
   Returns `:ok`.
 
   See the [options](#module-options).
@@ -55,8 +57,8 @@ defmodule Exco do
   ## Examples
 
       Exco.each(1..3, fn x -> IO.puts x*2 end)
-      2 
-      4 
+      2
+      4
       6
       #=> :ok
 
@@ -69,10 +71,15 @@ defmodule Exco do
   Concurrent version of `Enum.filter/2`.
 
   The applied function runs in a new process for each item.
-  These processes *are* linked to the caller.
 
-  The return value is a list and consists of the original
+  When `link: true`, the return value is a list and consists of the original
   values for which the applied function returns a truthy value.
+
+  When `link: false`, the return value is the same as in the case `link: true`.
+  Thus, falsy return values from the function or failing task processes are ignored.
+  No indication is provided whether a value was dropped due to it being falsy or
+  because of a failing process.
+
   The ordering is retained.
 
   See the [options](#module-options).
@@ -121,7 +128,7 @@ defmodule Exco do
   defp resolve_filter_values(enum, %{link: false}) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
-        {{:ok, true}, val} -> [{:ok, val} | acc]
+        {{:ok, true}, val} -> [val | acc]
         {{:ok, false}, _val} -> acc
         {_result, _val} -> acc
       end

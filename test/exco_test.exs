@@ -58,8 +58,8 @@ defmodule ExcoTest do
   end
 
   test "filter unlinked" do
-    assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), link: false) == [ok: 1, ok: 2]
-    assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2, link: false) == [ok: 1, ok: 2]
+    assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), link: false) == [1, 2]
+    assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2, link: false) == [1, 2]
   end
 
   test "map linked: tasks run to completion when caller finishes" do
@@ -387,6 +387,6 @@ defmodule ExcoTest do
     end)
 
     assert_receive :caller_alive
-    assert_receive {:result, [ok: 1]}
+    assert_receive {:result, [1]}
   end
 end
