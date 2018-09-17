@@ -101,6 +101,6 @@ defmodule Exco do
 
     enumerable
     |> Runner.enumerate(fun, opts)
-    |> Resolver.resolve_result(enumerable, operation, opts)
+    |> Resolver.get_result(enumerable, operation, opts)
   end
 end
