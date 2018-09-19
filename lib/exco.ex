@@ -17,7 +17,6 @@ defmodule Exco do
 
   @default_options [
     max_concurrency: :schedulers,
-    link: true,
     ordered: true
   ]
 
@@ -42,12 +41,11 @@ defmodule Exco do
 
   """
   def map(enumerable, fun, opts \\ []) do
-    run(:map, enumerable, fun, opts)
+    run(:map, true, enumerable, fun, opts)
   end
 
   def map_nolink(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :link, false)
-    run(:map, enumerable, fun, opts)
+    run(:map, false, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -68,12 +66,11 @@ defmodule Exco do
 
   """
   def each(enumerable, fun, opts \\ []) do
-    run(:each, enumerable, fun, opts)
+    run(:each, true, enumerable, fun, opts)
   end
 
   def each_nolink(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :link, false)
-    run(:each, enumerable, fun, opts)
+    run(:each, false, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -100,12 +97,11 @@ defmodule Exco do
 
   """
   def filter(enumerable, fun, opts \\ []) do
-    run(:filter, enumerable, fun, opts)
+    run(:filter, true, enumerable, fun, opts)
   end
 
   def filter_nolink(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :link, false)
-    run(:filter, enumerable, fun, opts)
+    run(:filter, false, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -133,21 +129,20 @@ defmodule Exco do
 
   """
   def stream_map(enumerable, fun, opts \\ []) do
-    run(:stream_map, enumerable, fun, opts)
+    run(:stream_map, true, enumerable, fun, opts)
   end
 
   def stream_map_nolink(enumerable, fun, opts \\ []) do
-    opts = Keyword.put(opts, :link, false)
-    run(:stream_map, enumerable, fun, opts)
+    run(:stream_map, false, enumerable, fun, opts)
   end
 
-  defp run(operation, enumerable, fun, opts) do
+  defp run(operation, link, enumerable, fun, opts) do
     opts =
       Opts.set_defaults(opts, @default_options)
       |> Enum.into(%{})
 
     enumerable
-    |> Runner.enumerate(fun, opts)
-    |> Resolver.get_result(enumerable, operation, opts)
+    |> Runner.enumerate(fun, link, opts)
+    |> Resolver.get_result(enumerable, operation, link)
   end
 end

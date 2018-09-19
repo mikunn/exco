@@ -1,33 +1,33 @@
 defmodule Exco.Resolver do
   @moduledoc false
 
-  def get_result(result, _enumerable, :map, options) do
+  def get_result(result, _enumerable, :map, link) do
     result
-    |> Enum.map(&get_map_value(&1, options))
+    |> Enum.map(&get_map_value(&1, link))
   end
 
-  def get_result(result, _enumerable, :each, _options) do
+  def get_result(result, _enumerable, :each, _link) do
     result
     |> Enum.each(fn value -> value end)
   end
 
-  def get_result(result, enumerable, :filter, options) do
+  def get_result(result, enumerable, :filter, link) do
     result
     |> Enum.zip(enumerable)
-    |> get_filter_values(options)
+    |> get_filter_values(link)
     |> Enum.reverse()
   end
 
-  def get_result(result, _enumerable, :stream_map, options) do
+  def get_result(result, _enumerable, :stream_map, link) do
     result
-    |> Stream.map(&get_map_value(&1, options))
+    |> Stream.map(&get_map_value(&1, link))
   end
 
-  defp get_map_value(value, %{link: false}), do: value
-  defp get_map_value({:ok, value}, %{link: true}), do: value
-  defp get_map_value(value, _options), do: value
+  defp get_map_value(value, false), do: value
+  defp get_map_value({:ok, value}, true), do: value
+  defp get_map_value(value, _link), do: value
 
-  defp get_filter_values(enum, %{link: false}) do
+  defp get_filter_values(enum, false) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
         {{:ok, true}, val} -> [val | acc]
@@ -37,7 +37,7 @@ defmodule Exco.Resolver do
     end)
   end
 
-  defp get_filter_values(enum, %{link: true}) do
+  defp get_filter_values(enum, true) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
         {true, val} -> [val | acc]

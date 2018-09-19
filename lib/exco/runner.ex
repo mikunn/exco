@@ -1,11 +1,11 @@
 defmodule Exco.Runner do
   @moduledoc false
 
-  def enumerate(enumerable, fun, %{link: true} = options) do
+  def enumerate(enumerable, fun, true = _link, options) do
     enumerate_link(enumerable, fun, options)
   end
 
-  def enumerate(enumerable, fun, %{link: false} = options) do
+  def enumerate(enumerable, fun, false = _link, options) do
     enumerate_nolink(enumerable, fun, options)
   end
 
