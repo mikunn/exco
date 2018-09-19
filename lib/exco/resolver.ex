@@ -18,6 +18,11 @@ defmodule Exco.Resolver do
     |> Enum.reverse()
   end
 
+  def get_result(result, _enumerable, :stream_map, options) do
+    result
+    |> Stream.map(&get_map_value(&1, options))
+  end
+
   defp get_map_value(value, %{link: false}), do: value
   defp get_map_value({:ok, value}, %{link: true}), do: value
   defp get_map_value(value, _options), do: value

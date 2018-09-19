@@ -94,6 +94,34 @@ defmodule Exco do
     run(:filter, enumerable, fun, opts)
   end
 
+  @doc ~S"""
+  Concurrent version of `Stream.map/2`.
+
+  The applied function runs in a new process for each item.
+
+  When `link: true`, the return value is a list and consists of the original
+  values for which the applied function returns a truthy value.
+
+  When `link: false`, the return value is the same as in the case `link: true`.
+  Thus, falsy return values from the function or failing task processes are ignored.
+  No indication is provided whether a value was dropped due to it being falsy or
+  because of a failing process.
+
+  The ordering is retained.
+
+  See the [options](#module-options).
+
+  ## Examples:
+
+      iex(1)> stream = Exco.stream_map(1..3, fn x -> x*2 end)
+      iex(2)> Enum.to_list(stream)
+      [2, 4, 6]
+
+  """
+  def stream_map(enumerable, fun, opts \\ []) do
+    run(:stream_map, enumerable, fun, opts)
+  end
+
   defp run(operation, enumerable, fun, opts) do
     opts =
       Opts.set_defaults(opts, @default_options)
