@@ -7,7 +7,6 @@ defmodule Exco do
 
   ## Options
 
-  * `link` - set this to `false` to not link the spawned processes with the caller. Defaults to `true`.
   * `max_concurrency` - the maximum number of items to run at the same time. Set it to an integer or one of the following:
     * `:schedulers` (default) - set to `System.schedulers_online/1`
     * `:full` - tries to run all items at the same time
@@ -46,6 +45,11 @@ defmodule Exco do
     run(:map, enumerable, fun, opts)
   end
 
+  def map_nolink(enumerable, fun, opts \\ []) do
+    opts = Keyword.put(opts, :link, false)
+    run(:map, enumerable, fun, opts)
+  end
+
   @doc ~S"""
   Concurrent version of `Enum.each/2`.
 
@@ -64,6 +68,11 @@ defmodule Exco do
 
   """
   def each(enumerable, fun, opts \\ []) do
+    run(:each, enumerable, fun, opts)
+  end
+
+  def each_nolink(enumerable, fun, opts \\ []) do
+    opts = Keyword.put(opts, :link, false)
     run(:each, enumerable, fun, opts)
   end
 
@@ -94,6 +103,11 @@ defmodule Exco do
     run(:filter, enumerable, fun, opts)
   end
 
+  def filter_nolink(enumerable, fun, opts \\ []) do
+    opts = Keyword.put(opts, :link, false)
+    run(:filter, enumerable, fun, opts)
+  end
+
   @doc ~S"""
   Concurrent version of `Stream.map/2`.
 
@@ -119,6 +133,11 @@ defmodule Exco do
 
   """
   def stream_map(enumerable, fun, opts \\ []) do
+    run(:stream_map, enumerable, fun, opts)
+  end
+
+  def stream_map_nolink(enumerable, fun, opts \\ []) do
+    opts = Keyword.put(opts, :link, false)
     run(:stream_map, enumerable, fun, opts)
   end
 
