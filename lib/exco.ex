@@ -13,12 +13,13 @@ defmodule Exco do
 
   """
 
-  alias Exco.{Opts, Resolver, Runner}
+  import Exco.Runner, only: [run: 4]
 
   @default_options [
     max_concurrency: :schedulers,
     ordered: true
   ]
+
 
   @doc ~S"""
   Concurrent version of `Enum.map/2`.
@@ -42,7 +43,7 @@ defmodule Exco do
 
   """
   def map(enumerable, fun, opts \\ []) do
-    run(:map, true, enumerable, fun, opts)
+    run(:map, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -64,7 +65,7 @@ defmodule Exco do
 
   """
   def map_nolink(enumerable, fun, opts \\ []) do
-    run(:map, false, enumerable, fun, opts)
+    run(:map, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -87,7 +88,7 @@ defmodule Exco do
 
   """
   def each(enumerable, fun, opts \\ []) do
-    run(:each, true, enumerable, fun, opts)
+    run(:each, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -110,7 +111,7 @@ defmodule Exco do
 
   """
   def each_nolink(enumerable, fun, opts \\ []) do
-    run(:each, false, enumerable, fun, opts)
+    run(:each, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -133,7 +134,7 @@ defmodule Exco do
 
   """
   def filter(enumerable, fun, opts \\ []) do
-    run(:filter, true, enumerable, fun, opts)
+    run(:filter, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -158,7 +159,7 @@ defmodule Exco do
 
   """
   def filter_nolink(enumerable, fun, opts \\ []) do
-    run(:filter, false, enumerable, fun, opts)
+    run(:filter, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -180,7 +181,7 @@ defmodule Exco do
 
   """
   def stream_map(enumerable, fun, opts \\ []) do
-    run(:stream_map, true, enumerable, fun, opts)
+    run(:stream_map, enumerable, fun, opts)
   end
 
   @doc ~S"""
@@ -202,16 +203,7 @@ defmodule Exco do
 
   """
   def stream_map_nolink(enumerable, fun, opts \\ []) do
-    run(:stream_map, false, enumerable, fun, opts)
+    run(:stream_map, enumerable, fun, opts)
   end
 
-  defp run(operation, link, enumerable, fun, opts) do
-    opts =
-      Opts.set_defaults(opts, @default_options)
-      |> Enum.into(%{})
-
-    enumerable
-    |> Runner.enumerate(fun, link, opts)
-    |> Resolver.get_result(enumerable, operation, link)
-  end
 end

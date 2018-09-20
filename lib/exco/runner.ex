@@ -1,12 +1,40 @@
 defmodule Exco.Runner do
   @moduledoc false
 
+  alias Exco.{Opts, Resolver, Runner}
+
+  defmacro run(operation, enumerable, fun, opts) do
+    quote do
+      opts =
+        Opts.set_defaults((unquote opts), @default_options)
+        |> Enum.into(%{})
+
+      operation = unquote operation
+      enumerable = unquote enumerable
+
+      {caller, arity} = unquote(__CALLER__.function)
+
+      link = Runner.link?(caller)
+
+      enumerable
+      |> Runner.enumerate((unquote fun), link, opts)
+      |> Resolver.get_result(enumerable, operation, link)
+    end
+  end
+
   def enumerate(enumerable, fun, true = _link, options) do
     enumerate_link(enumerable, fun, options)
   end
 
   def enumerate(enumerable, fun, false = _link, options) do
     enumerate_nolink(enumerable, fun, options)
+  end
+
+  def link?(fun) do
+    fun
+    |> Atom.to_string
+    |> String.ends_with?("_nolink")
+    |> Kernel.not
   end
 
   defp enumerate_link(enumerable, fun, %{max_concurrency: :full}) do
