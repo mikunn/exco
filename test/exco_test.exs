@@ -167,7 +167,6 @@ defmodule ExcoTest do
     spawn(fn ->
       spawn_link(fn ->
         Exco.map([1, 0, 2], fn _ ->
-          Process.sleep(10)
           Process.exit(self(), :kill)
         end)
       end)
@@ -203,7 +202,6 @@ defmodule ExcoTest do
     spawn(fn ->
       spawn_link(fn ->
         Exco.each([1, 0, 2], fn _ ->
-          Process.sleep(10)
           Process.exit(self(), :kill)
         end)
       end)
@@ -239,7 +237,6 @@ defmodule ExcoTest do
     spawn(fn ->
       spawn_link(fn ->
         Exco.filter([1, 0, 2], fn _ ->
-          Process.sleep(10)
           Process.exit(self(), :kill)
         end)
       end)
@@ -297,8 +294,6 @@ defmodule ExcoTest do
       spawn_link(fn ->
         result =
           Exco.map_nolink([1, 0, 2], fn x ->
-            Process.sleep(10)
-
             if x == 0 do
               Process.exit(self(), :kill)
             else
@@ -389,7 +384,6 @@ defmodule ExcoTest do
     pid = self()
 
     fun = fn _ ->
-      Process.sleep(10)
       Process.exit(self(), :kill)
     end
 
@@ -455,8 +449,6 @@ defmodule ExcoTest do
     pid = self()
 
     fun = fn x ->
-      Process.sleep(10)
-
       if x == 0 do
         Process.exit(self(), :kill)
       else
@@ -508,8 +500,6 @@ defmodule ExcoTest do
       spawn_link(fn ->
         result =
           Exco.each_nolink([1, 0, 2], fn x ->
-            Process.sleep(10)
-
             if x == 0 do
               Process.exit(self(), :kill)
             else
@@ -555,8 +545,6 @@ defmodule ExcoTest do
       spawn_link(fn ->
         result =
           Exco.filter_nolink([1, 0, 2], fn x ->
-            Process.sleep(10)
-
             if x == 0 do
               Process.exit(self(), :kill)
             else
