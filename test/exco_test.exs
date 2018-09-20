@@ -317,6 +317,95 @@ defmodule ExcoTest do
     assert_receive {:result, [ok: 1, exit: :killed, ok: 2]}
   end
 
+  test "stream_map: tasks run to completion when caller finishes" do
+    pid = self()
+
+    fun = fn x ->
+      Process.sleep(50)
+      send(pid, :task_alive)
+      x
+    end
+
+    spawn(fn ->
+      Exco.stream_map([1, 2, 3], fun)
+      |> Enum.to_list
+
+      send(pid, :result)
+    end)
+
+    Process.sleep(30)
+
+    assert_receive :task_alive
+    assert_receive :result
+  end
+
+  test "stream_map: tasks die when caller dies" do
+    pid = self()
+
+    fun = fn x ->
+      Process.sleep(50)
+      send(pid, :task_alive)
+      x
+    end
+
+    caller =
+      spawn(fn ->
+        Exco.stream_map([1, 2, 3], fun)
+        |> Enum.to_list
+      end)
+
+    Process.sleep(30)
+    Process.exit(caller, :kill)
+
+    refute_receive :task_alive
+  end
+
+  test "stream_map with max_concurrency: tasks die when caller dies" do
+    pid = self()
+
+    fun = fn x ->
+      Process.sleep(50)
+      send(pid, :task_alive)
+      x
+    end
+
+    caller =
+      spawn(fn ->
+        Exco.stream_map(
+          [1, 2, 3],
+          fun,
+          max_concurrency: 2
+        )
+        |> Enum.to_list
+      end)
+
+    Process.sleep(30)
+    Process.exit(caller, :kill)
+
+    refute_receive :task_alive
+  end
+
+  test "stream_map: caller dies when a task dies" do
+    pid = self()
+
+    fun = fn _ ->
+      Process.sleep(10)
+      Process.exit(self(), :kill)
+    end
+
+    spawn(fn ->
+      spawn_link(fn ->
+        Exco.stream_map([1, 0, 2], fun)
+        |> Enum.to_list
+      end)
+
+      Process.sleep(50)
+      send(pid, :caller_alive)
+    end)
+
+    refute_receive :caller_alive
+  end
+
   test "stream_map_nolink: tasks run to completion when caller finishes" do
     pid = self()
 
