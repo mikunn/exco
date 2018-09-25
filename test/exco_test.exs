@@ -295,6 +295,7 @@ defmodule ExcoTest do
         result =
           Exco.map_nolink([1, 0, 2], fn x ->
             if x == 0 do
+              Process.sleep(10)
               Process.exit(self(), :kill)
             else
               x
@@ -450,6 +451,7 @@ defmodule ExcoTest do
 
     fun = fn x ->
       if x == 0 do
+        Process.sleep(10)
         Process.exit(self(), :kill)
       else
         x
