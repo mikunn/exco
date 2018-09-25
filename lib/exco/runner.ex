@@ -37,41 +37,13 @@ defmodule Exco.Runner do
     |> Kernel.not
   end
 
-  defp enumerate_link(enumerable, fun, %{max_concurrency: :full}) do
-    awaited_map(enumerable, fun)
-  end
-
-  defp enumerate_link(enumerable, fun, %{max_concurrency: :schedulers} = options) do
-    opts = [
-      max_concurrency: resolve_max_concurrency(:schedulers, enumerable),
-      ordered: options[:ordered]
-    ]
-
-    async_stream(enumerable, fun, opts)
-  end
-
-  defp enumerate_link(enumerable, fun, %{max_concurrency: conc} = options) do
-    opts = [
-      max_concurrency: conc,
-      ordered: options[:ordered]
-    ]
-
+  defp enumerate_link(enumerable, fun, options) do
+    opts = async_stream_options(options, enumerable)
     async_stream(enumerable, fun, opts)
   end
 
   defp enumerate_nolink(enumerable, fun, options) do
-    conc =
-      case options[:max_concurrency] do
-        :schedulers -> resolve_max_concurrency(:schedulers, enumerable)
-        :full -> resolve_max_concurrency(:full, enumerable)
-        conc -> conc
-      end
-
-    opts = [
-      max_concurrency: conc,
-      ordered: options[:ordered]
-    ]
-
+    opts = async_stream_options(options, enumerable)
     async_stream_nolink(enumerable, fun, opts)
   end
 
@@ -85,12 +57,14 @@ defmodule Exco.Runner do
     |> Task.Supervisor.async_stream_nolink(enumerable, fun, options)
   end
 
-  defp awaited_map(enumerable, fun) do
-    enumerable
-    |> Enum.map(&Task.async(fn -> fun.(&1) end))
-    |> Enum.map(&Task.await/1)
+  defp async_stream_options(%{max_concurrency: conc, ordered: ordered}, enumerable) do
+    [
+      max_concurrency: resolve_max_concurrency(conc, enumerable),
+      ordered: ordered
+    ]
   end
 
+  defp resolve_max_concurrency(count, _enumerable) when is_integer(count), do: count
   defp resolve_max_concurrency(:schedulers, _enumerable), do: System.schedulers_online()
   defp resolve_max_concurrency(:full, enumerable) do
     case Enum.count(enumerable) do
@@ -98,4 +72,5 @@ defmodule Exco.Runner do
       count -> count
     end
   end
+
 end
