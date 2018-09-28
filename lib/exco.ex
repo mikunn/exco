@@ -41,6 +41,7 @@ defmodule Exco do
       [2, 4, 6]
 
   """
+  @spec map(Enumerable.t, (any -> any), keyword) :: list
   def map(enumerable, fun, opts \\ []) do
     run(:map, enumerable, fun, opts)
   end
@@ -63,6 +64,7 @@ defmodule Exco do
       [ok: 2, ok: 4, ok: 6]
 
   """
+  @spec map_nolink(Enumerable.t, (any -> any), keyword) :: list
   def map_nolink(enumerable, fun, opts \\ []) do
     run(:map, enumerable, fun, opts)
   end
@@ -86,6 +88,7 @@ defmodule Exco do
       #=> :ok
 
   """
+  @spec each(Enumerable.t, (any -> any), keyword) :: :ok
   def each(enumerable, fun, opts \\ []) do
     run(:each, enumerable, fun, opts)
   end
@@ -109,6 +112,7 @@ defmodule Exco do
       #=> :ok
 
   """
+  @spec each_nolink(Enumerable.t, (any -> any), keyword) :: :ok
   def each_nolink(enumerable, fun, opts \\ []) do
     run(:each, enumerable, fun, opts)
   end
@@ -132,6 +136,7 @@ defmodule Exco do
       [1, 2]
 
   """
+  @spec filter(Enumerable.t, (any -> as_boolean(any)), keyword) :: list
   def filter(enumerable, fun, opts \\ []) do
     run(:filter, enumerable, fun, opts)
   end
@@ -157,6 +162,7 @@ defmodule Exco do
       [1, 2]
 
   """
+  @spec filter_nolink(Enumerable.t, (any -> as_boolean(any)), keyword) :: list
   def filter_nolink(enumerable, fun, opts \\ []) do
     run(:filter, enumerable, fun, opts)
   end

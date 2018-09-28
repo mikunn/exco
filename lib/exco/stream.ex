@@ -38,6 +38,8 @@ defmodule Exco.Stream do
       [2, 4, 6]
 
   """
+
+  @spec map(Enumerable.t, (any -> any), keyword) :: Enumerable.t
   def map(enumerable, fun, opts \\ []) do
     run(:stream_map, enumerable, fun, opts)
   end
@@ -60,6 +62,7 @@ defmodule Exco.Stream do
       [ok: 2, ok: 4, ok: 6]
 
   """
+  @spec map_nolink(Enumerable.t, (any -> any), keyword) :: Enumerable.t
   def map_nolink(enumerable, fun, opts \\ []) do
     run(:stream_map, enumerable, fun, opts)
   end
