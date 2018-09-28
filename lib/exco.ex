@@ -1,7 +1,7 @@
 defmodule Exco do
   @moduledoc ~S"""
 
-  Functions to run things concurrently.
+  Concurrent versions of some of the functions in the `Enum` module.
 
   See further discussion in the [readme section](readme.html).
 
@@ -19,7 +19,6 @@ defmodule Exco do
     max_concurrency: :schedulers,
     ordered: true
   ]
-
 
   @doc ~S"""
   Concurrent version of `Enum.map/2`.
@@ -161,49 +160,4 @@ defmodule Exco do
   def filter_nolink(enumerable, fun, opts \\ []) do
     run(:filter, enumerable, fun, opts)
   end
-
-  @doc ~S"""
-  Concurrent version of `Stream.map/2`.
-
-  Returns a stream that concurrently calls `fun` for each item in `enumerable`.
-  This is similar to `Exco.map/3`, but lazily iterates through `enumerable`.
-  The caller and the spawned processes will be linked.
-
-  The ordering is retained.
-
-  See the [options](#module-options).
-
-  ## Examples:
-
-      iex(1)> stream = Exco.stream_map(1..3, fn x -> x*2 end)
-      iex(2)> Enum.to_list(stream)
-      [2, 4, 6]
-
-  """
-  def stream_map(enumerable, fun, opts \\ []) do
-    run(:stream_map, enumerable, fun, opts)
-  end
-
-  @doc ~S"""
-  Concurrent version of `Stream.map/2`.
-
-  Returns a stream that concurrently calls `fun` for each item in `enumerable`.
-  This is similar to `Exco.map_nolink/3`, but lazily iterates through `enumerable`.
-  The caller and the spawned processes will not be linked.
-
-  The ordering is retained.
-
-  See the [options](#module-options).
-
-  ## Examples:
-
-      iex(1)> stream = Exco.stream_map_nolink(1..3, fn x -> x*2 end)
-      iex(2)> Enum.to_list(stream)
-      [ok: 2, ok: 4, ok: 6]
-
-  """
-  def stream_map_nolink(enumerable, fun, opts \\ []) do
-    run(:stream_map, enumerable, fun, opts)
-  end
-
 end

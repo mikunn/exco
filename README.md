@@ -8,7 +8,7 @@ The library is not yet officially released and thus not available at [Hex](https
 
 ## Overview
 
-`Exco` is all about providing helper functions to run things concurrently. There are concurrent versions of functions in `Enum` module such as `Exco.map/2` and `Exco.each/2`. You can set the maximum number of concurrent processes and set whether the processes are linked to the caller or not.
+`Exco` is all about providing helper functions to run things concurrently. There are concurrent versions of functions in `Enum` and `Stream` module such as in `Exco` and `Exco.Stream` modules, respectively. To launch multiple tasks, you may want to check out `Exco.TaskList`. 
 
 This library is intended to be used to add concurrency to simple operations. If you need to squeeze out every millisecond of performance or have specific fault tolerance requirements, this library might not be for you.
 
@@ -24,6 +24,6 @@ If this is not desired, calling the functions ending with `_nolink` will fire ea
 
 ## Concurrency and performance
 
-If the operation is simple enough, the standard `Enum` functions will generally give you better performance than the corresponding functions in `Exco`. However, when the operations get a bit more CPU or especially I/O bound, running the `Exco` versions will start to make sense.
+The functions in `Exco` and `Exco.Stream` modules will usually provide worse performance compared to the versions in the standard library with CPU bound tasks. However, when the operations get a bit more CPU or especially I/O bound, running the `Exco` versions will start to make sense.
 
-By default, `Exco` will run concurrently no more items than the number of schedulers online determined by `System.schedulers_online/1`. If you want to make this explicit, you can set the `max_concurrency` option to `:schedulers`. You can also set `max_concurrency` to either an integer or `:full`. When `:full`, there is no explicit limit.
+By default, the functions in `Exco` and `Exco.Stream` will run concurrently no more items than the number of schedulers online determined by `System.schedulers_online/1`. If you want to make this explicit, you can set the `max_concurrency` option to `:schedulers`. You can also set `max_concurrency` to either an integer or `:full`. When `:full`, there is no explicit limit.
