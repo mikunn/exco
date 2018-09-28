@@ -29,8 +29,6 @@ defmodule Exco do
   The return value is a list where each item is a result of invoking `fun` on each
   corresponding item of `enumerable`.
 
-  * a list consisting of either `{:ok, value}` or `{:exit, reason}` tuples (when `link: false`).
-
   The ordering is retained.
 
   See the [options](#module-options).
