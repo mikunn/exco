@@ -8,19 +8,19 @@ defmodule Exco.StreamTest do
       assert stream?(stream)
       assert Enum.to_list(stream) == []
 
-      assert Exco.Stream.map([1, 2, 3], &(&1 * &1)) |> Enum.to_list == [1, 4, 9]
+      assert Exco.Stream.map([1, 2, 3], &(&1 * &1)) |> Enum.to_list == [ok: 1, ok: 4, ok: 9]
 
       stream = Exco.Stream.map([1, 2, 3], &(&1 * &1), max_concurrency: 2)
       assert stream?(stream)
-      assert Enum.to_list(stream) == [1, 4, 9]
+      assert Enum.to_list(stream) == [ok: 1, ok: 4, ok: 9]
 
       stream = Exco.Stream.map([1, 2, 3], &(&1 * &1), max_concurrency: :schedulers)
       assert stream?(stream)
-      assert Enum.to_list(stream) == [1, 4, 9]
+      assert Enum.to_list(stream) == [ok: 1, ok: 4, ok: 9]
 
       stream = Exco.Stream.map([1, 2, 3], &(&1 * &1), max_concurrency: :full)
       assert stream?(stream)
-      assert Enum.to_list(stream) == [1, 4, 9]
+      assert Enum.to_list(stream) == [ok: 1, ok: 4, ok: 9]
     end
 
     test "tasks run to completion when caller finishes" do

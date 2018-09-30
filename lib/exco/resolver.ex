@@ -23,16 +23,14 @@ defmodule Exco.Resolver do
     |> Stream.map(&get_map_value(&1, link))
   end
 
-  defp get_map_value(value, false), do: value
-  defp get_map_value({:ok, value}, true), do: value
+  defp get_map_value({:ok, value}, true), do: {:ok, value}
   defp get_map_value(value, _link), do: value
 
   defp get_filter_values(enum, false) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
-        {{:ok, true}, val} -> [val | acc]
-        {{:ok, false}, _val} -> acc
-        {_result, _val} -> acc
+        {{:ok, true}, val} -> [{:ok, val} | acc]
+        _other -> acc
       end
     end)
   end
@@ -40,10 +38,9 @@ defmodule Exco.Resolver do
   defp get_filter_values(enum, true) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
-        {true, val} -> [val | acc]
-        {{:ok, true}, val} -> [val | acc]
-        {false, _val} -> acc
-        {{:ok, false}, _val} -> acc
+        {true, val} -> [{:ok, val} | acc]
+        {{:ok, true}, val} -> [{:ok, val} | acc]
+        _other -> acc
       end
     end)
   end

@@ -5,10 +5,16 @@ defmodule ExcoTest do
   describe "map" do
     test "basic functionality" do
       assert Exco.map([], &(&1 * &1)) == []
-      assert Exco.map([1, 2, 3], &(&1 * &1)) == [1, 4, 9]
-      assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: 2) == [1, 4, 9]
-      assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :schedulers) == [1, 4, 9]
-      assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :full) == [1, 4, 9]
+      assert Exco.map([1, 2, 3], &(&1 * &1)) == [ok: 1, ok: 4, ok: 9]
+      assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: 2) == [ok: 1, ok: 4, ok: 9]
+      assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :schedulers) == [ok: 1, ok: 4, ok: 9]
+      assert Exco.map([1, 2, 3], &(&1 * &1), max_concurrency: :full) == [ok: 1, ok: 4, ok: 9]
+    end
+
+    @tag capture_log: true
+    test "trapping exits" do
+      Process.flag(:trap_exit, true)
+      assert [{:exit, {:badarith, _}}, {:ok, 1.0}, {:ok, 0.5}] = Exco.map(0..2, &(1/&1))
     end
 
     test "tasks run to completion when caller finishes" do
@@ -261,8 +267,15 @@ defmodule ExcoTest do
 
   describe "filter" do
     test "basic functionality" do
-      assert Exco.filter([1, 2, 3], &(&1 * 2 < 5)) == [1, 2]
-      assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2) == [1, 2]
+      assert Exco.filter([1, 2, 3], &(&1 * 2 < 5)) == [ok: 1, ok: 2]
+      assert Exco.filter([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2) == [ok: 1, ok: 2]
+    end
+
+    @tag capture_log: true
+    test "trapping exits" do
+      Process.flag(:trap_exit, true)
+      assert Exco.filter(2..0, &(1 / &1 < 1)) == [ok: 2]
+      assert Exco.filter(0..2, &(1 / &1 < 1)) == [ok: 2]
     end
 
     test "caller dies when a task dies" do
@@ -303,8 +316,8 @@ defmodule ExcoTest do
 
   describe "filter_nolink" do
     test "basic functionality" do
-      assert Exco.filter_nolink([1, 2, 3], &(&1 * 2 < 5)) == [1, 2]
-      assert Exco.filter_nolink([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2) == [1, 2]
+      assert Exco.filter_nolink([1, 2, 3], &(&1 * 2 < 5)) == [ok: 1, ok: 2]
+      assert Exco.filter_nolink([1, 2, 3], &(&1 * 2 < 5), max_concurrency: 2) == [ok: 1, ok: 2]
     end
 
     test "tasks run to completion when caller dies" do
@@ -349,7 +362,7 @@ defmodule ExcoTest do
       end)
 
       assert_receive :caller_alive
-      assert_receive {:result, [1]}
+      assert_receive {:result, [ok: 1]}
     end
   end
 
@@ -369,6 +382,5 @@ defmodule ExcoTest do
         {:invalid_message, other}
     end
   end
-
 end
 

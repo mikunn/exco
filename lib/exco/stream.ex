@@ -35,7 +35,7 @@ defmodule Exco.Stream do
 
       iex(1)> stream = Exco.Stream.map(1..3, fn x -> x*2 end)
       iex(2)> Enum.to_list(stream)
-      [2, 4, 6]
+      [ok: 2, ok: 4, ok: 6]
 
   """
 

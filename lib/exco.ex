@@ -13,6 +13,9 @@ defmodule Exco do
 
   """
 
+  @type ok() :: {:ok, any}
+  @type ex() :: {:ok, any}
+
   import Exco.Runner, only: [run: 4]
 
   @default_options [
@@ -26,8 +29,10 @@ defmodule Exco do
   The applied function runs in a new process for each item.
   The caller and the spawned processes will be linked.
 
-  The return value is a list where each item is a result of invoking `fun` on each
-  corresponding item of `enumerable`.
+  The return value is a list of either `{:ok, value}` or
+  `{:exit, reason}` if the caller is trapping exits. Each
+  `value` is a result of invoking `fun` on each corresponding
+  item of `enumerable`.
 
   The ordering is retained.
 
@@ -36,10 +41,10 @@ defmodule Exco do
   ## Examples:
 
       iex(1)> Exco.map(1..3, fn x -> x*2 end)
-      [2, 4, 6]
+      [ok: 2, ok: 4, ok: 6]
 
   """
-  @spec map(Enumerable.t, (any -> any), keyword) :: list
+  @spec map(Enumerable.t, (any -> any), keyword) :: [ok | ex]
   def map(enumerable, fun, opts \\ []) do
     run(:map, enumerable, fun, opts)
   end
@@ -62,7 +67,7 @@ defmodule Exco do
       [ok: 2, ok: 4, ok: 6]
 
   """
-  @spec map_nolink(Enumerable.t, (any -> any), keyword) :: list
+  @spec map_nolink(Enumerable.t, (any -> any), keyword) :: [ok | ex]
   def map_nolink(enumerable, fun, opts \\ []) do
     run(:map, enumerable, fun, opts)
   end
@@ -121,8 +126,9 @@ defmodule Exco do
   The applied function runs in a new process for each item.
   The caller and the spawned processes will be linked.
 
-  The return value is a list and consists of the original
-  values for which the applied function returns a truthy value.
+  The return value is a list of `{:ok, value}` tuples where
+  `value` is the original value for which the applied function
+  returned a truthy value.
 
   The ordering is retained.
 
@@ -131,10 +137,10 @@ defmodule Exco do
   ## Examples:
 
       iex(1)> Exco.filter(1..3, fn x -> x < 3 end)
-      [1, 2]
+      [ok: 1, ok: 2]
 
   """
-  @spec filter(Enumerable.t, (any -> as_boolean(any)), keyword) :: list
+  @spec filter(Enumerable.t, (any -> as_boolean(any)), keyword) :: [ok]
   def filter(enumerable, fun, opts \\ []) do
     run(:filter, enumerable, fun, opts)
   end
@@ -147,8 +153,10 @@ defmodule Exco do
 
   The return value is the same as in the case of `Exco.filter/3`.
   Thus, falsy return values from the function or failing task processes are ignored.
-  No indication is provided whether a value was dropped due to it being falsy or
-  because of a failing process.
+  No indication is provided whether a value was dropped due to falsy return value
+  from the function or because of a failing process. If you need to separate
+  failing processes from falsy return values, consider using `Exco.map_nolink/3`
+  and filtering separately.
 
   The ordering is retained.
 
@@ -157,10 +165,10 @@ defmodule Exco do
   ## Examples:
 
       iex(1)> Exco.filter_nolink(1..3, fn x -> x < 3 end)
-      [1, 2]
+      [ok: 1, ok: 2]
 
   """
-  @spec filter_nolink(Enumerable.t, (any -> as_boolean(any)), keyword) :: list
+  @spec filter_nolink(Enumerable.t, (any -> as_boolean(any)), keyword) :: [ok]
   def filter_nolink(enumerable, fun, opts \\ []) do
     run(:filter, enumerable, fun, opts)
   end
