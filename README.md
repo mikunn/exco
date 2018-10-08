@@ -8,7 +8,7 @@ The library is not yet officially released and thus not available at [Hex](https
 
 ## Overview
 
-`Exco` is all about providing helper functions to run things concurrently. There are concurrent versions of functions in `Enum` and `Stream` module such as in `Exco` and `Exco.Stream` modules, respectively. To launch multiple tasks, you may want to check out `Exco.TaskList`. 
+`Exco` is all about providing helper functions to run things concurrently. There are concurrent versions of functions in `Enum` and `Stream` module in `Exco` and `Exco.Stream` modules, respectively. To launch multiple tasks, you may want to check out `Exco.TaskList`. 
 
 This library is intended to be used to add concurrency to simple operations. If you need to squeeze out every millisecond of performance or have specific fault tolerance requirements, this library might not be for you.
 
