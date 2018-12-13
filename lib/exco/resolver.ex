@@ -11,10 +11,10 @@ defmodule Exco.Resolver do
     |> Enum.each(fn value -> value end)
   end
 
-  def get_result(result, enumerable, :filter, link) do
+  def get_result(result, enumerable, :filter, _link) do
     result
     |> Enum.zip(enumerable)
-    |> get_filter_values(link)
+    |> get_filter_values()
     |> Enum.reverse()
   end
 
@@ -26,19 +26,9 @@ defmodule Exco.Resolver do
   defp get_map_value({:ok, value}, true), do: {:ok, value}
   defp get_map_value(value, _link), do: value
 
-  defp get_filter_values(enum, false) do
+  defp get_filter_values(enum) do
     Enum.reduce(enum, [], fn res, acc ->
       case res do
-        {{:ok, true}, val} -> [{:ok, val} | acc]
-        _other -> acc
-      end
-    end)
-  end
-
-  defp get_filter_values(enum, true) do
-    Enum.reduce(enum, [], fn res, acc ->
-      case res do
-        {true, val} -> [{:ok, val} | acc]
         {{:ok, true}, val} -> [{:ok, val} | acc]
         _other -> acc
       end
