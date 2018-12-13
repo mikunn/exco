@@ -23,11 +23,13 @@ defmodule Exco.Runner do
   end
 
   def enumerate(enumerable, fun, true = _link, options) do
-    enumerate_link(enumerable, fun, options)
+    opts = async_stream_options(options, enumerable)
+    async_stream(enumerable, fun, opts)
   end
 
   def enumerate(enumerable, fun, false = _link, options) do
-    enumerate_nolink(enumerable, fun, options)
+    opts = async_stream_options(options, enumerable)
+    async_stream_nolink(enumerable, fun, opts)
   end
 
   def link?(fun) do
@@ -35,16 +37,6 @@ defmodule Exco.Runner do
     |> Atom.to_string
     |> String.ends_with?("_nolink")
     |> Kernel.not
-  end
-
-  defp enumerate_link(enumerable, fun, options) do
-    opts = async_stream_options(options, enumerable)
-    async_stream(enumerable, fun, opts)
-  end
-
-  defp enumerate_nolink(enumerable, fun, options) do
-    opts = async_stream_options(options, enumerable)
-    async_stream_nolink(enumerable, fun, opts)
   end
 
   defp async_stream(enumerable, fun, options) do
