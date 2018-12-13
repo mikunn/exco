@@ -14,7 +14,7 @@ defmodule Exco do
   """
 
   @type ok() :: {:ok, any}
-  @type ex() :: {:ok, any}
+  @type ex() :: {:ex, any}
 
   import Exco.Runner, only: [run: 4]
 
